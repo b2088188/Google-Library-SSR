@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import axios from 'axios';
 import { useQuery } from 'react-query';
+import Pagination from '../../components/Pagination';
+import sliceData from '../../utils/sliceData';
 
 const SearchResults = () => {
 	const result = useQuery({
@@ -12,8 +14,9 @@ const SearchResults = () => {
 				.get('https://www.googleapis.com/books/v1/volumes?maxResults=40&q=harry')
 				.then(({ data }) => data.items)
 	});
-
 	const data = result.data ?? [];
+	const [page, setPage] = useState(1);
+	const paginatedData = sliceData(data, page);
 
 	return (
 		<div
@@ -24,7 +27,7 @@ const SearchResults = () => {
 			`}
 		>
 			<ul className='results'>
-				{data.map((result) => {
+				{paginatedData.map((result) => {
 					const imgSrc = result.volumeInfo.imageLinks
 						? result.volumeInfo.imageLinks.smallThumbnail
 						: 'http://books.google.com/books/content?id=DKcWE3WXoj8C&printsec=frontcover&img=1';
@@ -121,6 +124,7 @@ const SearchResults = () => {
 					);
 				})}
 			</ul>
+			<Pagination page={page} resLength={data.length} />
 		</div>
 	);
 };
