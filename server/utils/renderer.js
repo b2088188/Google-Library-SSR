@@ -6,7 +6,6 @@ import { renderRoutes } from 'react-router-config';
 import GlobalStyle from '../../client/design/GlobalStyle';
 import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
 //import { Provider } from 'react-redux';
-//import serialize from 'serialize-javascript';
 import { QueryClientProvider } from 'react-query';
 import { dehydrate, Hydrate } from 'react-query/hydration';
 import serialize from 'serialize-javascript';
@@ -38,7 +37,7 @@ function renderer(req, queryClient) {
 	<body>
 		<div id = 'root'>${template}</div>
 		<script>
-		window.__REACT_QUERY_STATE__ = ${JSON.stringify(dehydratedState)};
+		window.__REACT_QUERY_STATE__ = ${serialize(dehydratedState)};
 		</script>	
 		<script src = 'bundle.js'>
 		</script>

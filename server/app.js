@@ -11,9 +11,9 @@ app.use(express.static('public'));
 app.get('*', (req, res) => {
 	const queryClient = new QueryClient();
 	const promises = matchRoutes(Routes, req.path)
-		.map(({ route }) => {
+		.map(({ route, match }) => {
 			// If the component has loadData function, call it and return the promise
-			return route.loadData ? route.loadData(queryClient) : null;
+			return route.loadData ? route.loadData(req, queryClient, match) : null;
 		})
 		.map((promise) => {
 			if (promise)

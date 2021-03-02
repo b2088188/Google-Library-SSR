@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components/macro';
 
-const Pagination = ({ page, resLength }) => {
+const Pagination = ({ page, onPageChange, resLength }) => {
 	const pages = Math.ceil(resLength / 10);
 
 	if (pages < 2) return null;
@@ -39,6 +39,7 @@ const Pagination = ({ page, resLength }) => {
 									outline: none;
 								}
 							`}
+							onClick={() => onPageChange(page)}
 						>
 							<span>{page}</span>
 						</button>

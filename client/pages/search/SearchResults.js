@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components/macro';
 import axios from 'axios';
 import { useQuery } from 'react-query';
@@ -7,17 +7,20 @@ import Pagination from '../../components/Pagination';
 import sliceData from '../../utils/sliceData';
 
 const SearchResults = () => {
+	const { search } = useLocation();
+	const searchParams = new URLSearchParams(search);
+	const q = searchParams.get('q');
+
 	const result = useQuery({
-		queryKey: 'harry',
+		queryKey: ['book-items', { q }],
 		queryFn: () =>
 			axios
-				.get('https://www.googleapis.com/books/v1/volumes?maxResults=40&q=harry')
+				.get(`https://www.googleapis.com/books/v1/volumes?maxResults=40&q=${q}`)
 				.then(({ data }) => data.items)
 	});
 	const data = result.data ?? [];
 	const [page, setPage] = useState(1);
 	const paginatedData = sliceData(data, page);
-
 	return (
 		<div
 			css={`
@@ -124,15 +127,16 @@ const SearchResults = () => {
 					);
 				})}
 			</ul>
-			<Pagination page={page} resLength={data.length} />
+			<Pagination page={page} onPageChange={setPage} resLength={data.length} />
 		</div>
 	);
 };
 
-async function loadData(queryClient) {
-	await queryClient.prefetchQuery('harry', () =>
+async function loadData(req, queryClient) {
+	const q = req.query.q;
+	await queryClient.prefetchQuery(['book-items', { q }], () =>
 		axios
-			.get('https://www.googleapis.com/books/v1/volumes?maxResults=40&q=harry')
+			.get(`https://www.googleapis.com/books/v1/volumes?maxResults=40&q=${q}`)
 			.then(({ data }) => data.items)
 	);
 }

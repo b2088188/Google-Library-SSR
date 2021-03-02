@@ -1,8 +1,17 @@
 import React from 'react';
 import styled from 'styled-components/macro';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import axios from 'axios';
 
 const BookInfo = () => {
+	const { bookId } = useParams();
+	const result = useQuery({
+		queryKey: ['bookinfo', { bookId }],
+		queryFn: () =>
+			axios.get(`https://www.googleapis.com/books/v1/volumes/${bookId}`).then(({ data }) => data)
+	});
+	const { data } = result;
 	return (
 		<div
 			css={`
@@ -45,7 +54,7 @@ const BookInfo = () => {
 						`}
 					>
 						<img
-							src='https://books.google.com/books/content/images/frontcover/DKcWE3WXoj8C?fife=w600-h500'
+							src={`https://books.google.com/books/content/images/frontcover/${data?.id}?fife=w600-h500`}
 							alt='Image Test'
 							css={`
 								transform: translate(-4rem, -1.5rem);
@@ -88,7 +97,7 @@ const BookInfo = () => {
 							transform: skewX(13deg);
 						`}
 					>
-						Harry Potter and International Relations
+						{data?.volumeInfo?.title || ''}
 					</span>
 				</h1>
 				<span
@@ -111,7 +120,7 @@ const BookInfo = () => {
 						background-clip: text;
 					`}
 				>
-					Daniel H. NexonIver B. Neumann
+					{data?.volumeInfo?.authors || 'Unknown'}
 				</h2>
 				<span
 					css={`
@@ -133,7 +142,7 @@ const BookInfo = () => {
 						background-clip: text;
 					`}
 				>
-					3.5
+					{data?.volumeInfo?.averageRating || 'Unknown'}
 				</h2>
 				<span
 					css={`
@@ -155,7 +164,7 @@ const BookInfo = () => {
 						background-clip: text;
 					`}
 				>
-					Rowman & Littlefield
+					{data?.volumeInfo?.publisher || 'Unknown'}
 				</h2>
 				<span
 					css={`
@@ -177,7 +186,7 @@ const BookInfo = () => {
 						background-clip: text;
 					`}
 				>
-					Unknown
+					{data?.volumeInfo?.publisherDate || 'Unknown'}
 				</h2>
 				{/*<button className='btn-text--2'>Add to Cart &rarr;</button>*/}
 				{/*renderBookMarkBtn(authState.SignedState, authState.userId)*/}
@@ -216,14 +225,24 @@ const BookInfo = () => {
 						Description
 					</span>
 				</h1>
-				<div>
-					Why not take seriously the claim that Harry Potter's world intertwines with our own?
-				</div>
+				<div>{data?.volumeInfo?.description || ''}</div>
 			</div>
 		</div>
 	);
 };
 
+async function loadData(req, queryClient, match) {
+	const {
+		params: { bookId }
+	} = match;
+
+	if (bookId !== 'bundle.js')
+		await queryClient.prefetchQuery(['bookinfo', { bookId }], () =>
+			axios.get(`https://www.googleapis.com/books/v1/volumes/${bookId}`).then(({ data }) => data)
+		);
+}
+
 export default {
-	component: BookInfo
+	component: BookInfo,
+	loadData
 };
