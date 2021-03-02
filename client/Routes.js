@@ -1,5 +1,7 @@
 import App from './App';
 import Home from './pages/Home';
+import SearchResults from './pages/search/SearchResults';
+import BookInfo from './pages/book/BookInfo';
 
 const Routes = [
 	{
@@ -9,6 +11,14 @@ const Routes = [
 				...Home,
 				path: '/',
 				exact: true
+			},
+			{
+				...SearchResults,
+				path: '/results'
+			},
+			{
+				...BookInfo,
+				path: '/book/:bookId'
 			}
 		]
 	}

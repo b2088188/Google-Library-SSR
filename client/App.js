@@ -11,7 +11,7 @@ const App = ({ route }) => {
 			<GlobalStyle />
 			<div className='container'>
 				<Header />
-				{/*renderRoutes(route.routes)*/}
+				{renderRoutes(route.routes)}
 			</div>
 		</>
 	);
