@@ -7,21 +7,28 @@ import GlobalStyle from '../../client/design/GlobalStyle';
 import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
 //import { Provider } from 'react-redux';
 //import serialize from 'serialize-javascript';
+import { QueryClientProvider } from 'react-query';
+import { dehydrate, Hydrate } from 'react-query/hydration';
+import serialize from 'serialize-javascript';
 
-function renderer(req) {
+function renderer(req, queryClient) {
+	const dehydratedState = dehydrate(queryClient);
 	const sheet = new ServerStyleSheet();
 	const template = renderToString(
-		<Router location={req.path} context={{}}>
-			<StyleSheetManager sheet={sheet.instance}>
-				<>
-					<GlobalStyle />
-					<div>{renderRoutes(Routes)}</div>
-				</>
-			</StyleSheetManager>
-		</Router>
+		<QueryClientProvider client={queryClient}>
+			<Hydrate state={dehydratedState}>
+				<Router location={req.path} context={{}}>
+					<StyleSheetManager sheet={sheet.instance}>
+						<>
+							<GlobalStyle />
+							<div>{renderRoutes(Routes)}</div>
+						</>
+					</StyleSheetManager>
+				</Router>
+			</Hydrate>
+		</QueryClientProvider>
 	);
 	const styleTags = sheet.getStyleTags();
-
 	sheet.seal();
 	return `<html>
 	<head>	
@@ -30,9 +37,11 @@ function renderer(req) {
 	${styleTags}
 	<body>
 		<div id = 'root'>${template}</div>
+		<script>
+		window.__REACT_QUERY_STATE__ = ${JSON.stringify(dehydratedState)};
+		</script>	
 		<script src = 'bundle.js'>
 		</script>
-		<script src="https://unpkg.com/styled-components/dist/styled-components.min.js"></script>
 	</body> 
 	</html>`;
 }
