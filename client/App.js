@@ -1,11 +1,20 @@
 import React from 'react';
-//import { renderRoutes } from 'react-router-config';
-//import Header from './components/Header';
+import Header from './components/Header';
+import GlobalStyle from './design/GlobalStyle';
+import { renderRoutes } from 'react-router-config';
 //import { fetchCurrentUser } from './actions';
 
 // The route contains collection of components that we need to render
 const App = ({ route }) => {
-	return <div>App</div>;
+	return (
+		<>
+			<GlobalStyle />
+			<div className='container'>
+				<Header />
+				{/*renderRoutes(route.routes)*/}
+			</div>
+		</>
+	);
 };
 
 export default {
